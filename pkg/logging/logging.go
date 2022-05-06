@@ -34,18 +34,16 @@ func Init() {
 		FullTimestamp: true,
 	}
 
-	err := os.MkdirAll("../logs", 0755)
-
-	if err != nil || os.IsExist(err) {
-		panic(any("can't create log dir. no configured logging to files"))
-	} else {
-		allFile, err := os.OpenFile("logs/all.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
-		if err != nil {
-			panic(any(fmt.Sprintf("[Message]: %s", err)))
-		}
-
-		l.SetOutput(allFile) // Send all logs to nowhere by default
+	if err := os.Mkdir("logs", 0755); err != nil {
+		panic(any(fmt.Sprintf("[Message]: %s", err)))
 	}
+
+	allFile, err := os.OpenFile("logs/all.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(any(fmt.Sprintf("[Message]: %s", err)))
+	}
+
+	l.SetOutput(allFile)
 
 	l.SetLevel(logrus.TraceLevel)
 

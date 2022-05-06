@@ -1,11 +1,13 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/skullkon/info-app/pkg/client"
-	"log"
+	"errors"
+	"github.com/skullkon/info-app/pkg/logging"
+	"github.com/skullkon/info-app/pkg/shutdown"
+	"net"
+	"net/http"
+	"os"
+	"syscall"
 	"time"
 )
 
@@ -24,15 +26,19 @@ type Info struct {
 }
 
 func main() {
-	ctx := clickhouse.Context(context.Background(), clickhouse.WithSettings(clickhouse.Settings{
-		"max_block_size": 10,
-	}), clickhouse.WithProgress(func(p *clickhouse.Progress) {
-		fmt.Println("progress: ", p)
-	}))
-	ch, err := client.NewClient(ctx)
-	if err != nil {
-		return
-	}
+	var listener net.Listener
+	logging.Init()
+	logger := logging.GetLogger()
+	logger.Println("logger initialized")
+	//ctx := clickhouse.Context(context.Background(), clickhouse.WithSettings(clickhouse.Settings{
+	//	"max_block_size": 10,
+	//}), clickhouse.WithProgress(func(p *clickhouse.Progress) {
+	//	fmt.Println("progress: ", p)
+	//}))
+	//ch, err := client.NewClient(ctx)
+	//if err != nil {
+	//	return
+	//}
 	//parser, err := uaparser.New("./regexes.yaml")
 	//if err != nil {
 	//	log.Fatal(err)
@@ -89,12 +95,25 @@ func main() {
 	//	return
 	//}
 	//
-	var results []Info
 
-	if err := ch.Select(ctx, &results, "SELECT brand FROM info ORDER BY brand ASC COLLATE 'en' LIMIT 5"); err != nil {
-		log.Println(err)
-		return
+	server := &http.Server{
+		//Handler:      router,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
 	}
 
-	fmt.Println(results)
+	go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
+		server)
+
+	logger.Println("application initialized and started")
+
+	if err := server.Serve(listener); err != nil {
+		switch {
+		case errors.Is(err, http.ErrServerClosed):
+			logger.Warn("server shutdown")
+		default:
+			logger.Fatal(err)
+		}
+	}
+
 }
