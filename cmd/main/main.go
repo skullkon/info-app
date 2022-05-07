@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/skullkon/info-app/api"
-	v1 "github.com/skullkon/info-app/api/v1"
+	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/skullkon/info-app/internal/repository"
+	"github.com/skullkon/info-app/pkg/client"
 	"github.com/skullkon/info-app/pkg/logging"
 	"time"
 )
@@ -26,15 +28,16 @@ func main() {
 	logging.Init()
 	logger := logging.GetLogger()
 	logger.Println("logger initialized")
-	//ctx := clickhouse.Context(context.Background(), clickhouse.WithSettings(clickhouse.Settings{
-	//	"max_block_size": 10,
-	//}), clickhouse.WithProgress(func(p *clickhouse.Progress) {
-	//	fmt.Println("progress: ", p)
-	//}))
-	//ch, err := client.NewClient(ctx)
-	//if err != nil {
-	//	return
-	//}
+
+	ctx := clickhouse.Context(context.Background(), clickhouse.WithSettings(clickhouse.Settings{
+		"max_block_size": 10,
+	}), clickhouse.WithProgress(func(p *clickhouse.Progress) {
+		fmt.Println("progress: ", p)
+	}))
+	ch, err := client.NewClient(ctx)
+	if err != nil {
+		return
+	}
 	//parser, err := uaparser.New("./regexes.yaml")
 	//if err != nil {
 	//	log.Fatal(err)
@@ -92,18 +95,12 @@ func main() {
 	//}
 	//
 
-	services := v1.Deps{}
-
-	hanlder := v1.NewHandler(services)
-
-	hanlder.InitRoutes()
-
-	serv := api.NewServer(8080, hanlder.InitRoutes())
-	if err := serv.ListenAndServe(); err != nil {
-		fmt.Print(err)
+	test := repository.NewRepositories(ch, &logger)
+	all, err := test.Information.GetAll(ctx)
+	if err != nil {
 		return
 	}
-
+	fmt.Println(all)
 	//go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
 	//	server)
 

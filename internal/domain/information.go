@@ -1,4 +1,4 @@
-package information
+package domain
 
 import "time"
 
