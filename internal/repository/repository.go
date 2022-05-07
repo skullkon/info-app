@@ -11,7 +11,7 @@ type Information interface {
 	Insert(ctx context.Context, info []domain.Info) error
 	GetAll(ctx context.Context) ([]domain.Info, error)
 	GetRating(ctx context.Context, attr string) ([]string, error)
-	GetRatingWithParam(ctx context.Context, attr string, param string) ([]string, error)
+	GetRatingWithParam(ctx context.Context, column string, value string, attr string) ([]string, error)
 }
 
 type Repositories struct {

@@ -103,14 +103,13 @@ func (r *Repository) GetRatingWithParam(ctx context.Context, column string, valu
 	if len(clm) != 1 && len(val) != 1 {
 		return nil, errors.New("something goes wrong")
 	}
-	query := fmt.Sprintf("SELECT %s FROM info WHERE %clm = '%' Group by %s ORDER BY count(id) DESC LIMIT 100", attribute[0], clm[0], val[0], attribute[0])
-
+	query := fmt.Sprintf("SELECT %s FROM info WHERE %s = '%s' Group by %s ORDER BY count(id) DESC LIMIT 100", attribute[0], clm[0], val[0], attribute[0])
+	fmt.Println(query)
 	rows, err := r.client.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		err := rows.Scan(&res.Os)
 		if err != nil {
