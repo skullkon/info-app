@@ -34,8 +34,13 @@ func Init() {
 		FullTimestamp: true,
 	}
 
-	if err := os.Mkdir("logs", 0755); err != nil {
-		panic(any(fmt.Sprintf("[Message]: %s", err)))
+	_, err := os.Stat("logs")
+	if err != nil {
+		if os.IsNotExist(err) {
+			if err := os.Mkdir("logs", 0755); err != nil {
+				panic(any(fmt.Sprintf("[Message]: %s", err)))
+			}
+		}
 	}
 
 	allFile, err := os.OpenFile("logs/all.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)

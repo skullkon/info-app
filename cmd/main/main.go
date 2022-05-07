@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/skullkon/info-app/internal/repository"
+	"github.com/skullkon/info-app/internal/service"
 	"github.com/skullkon/info-app/pkg/client"
 	"github.com/skullkon/info-app/pkg/logging"
 	"time"
@@ -100,7 +101,14 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	deps := service.Deps{Repos: test, Logger: logger}
+
+	services := service.NewServices(deps)
+	fmt.Println(services.Information.HelloWorld(ctx))
+
 	fmt.Println(all)
+
 	//go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
 	//	server)
 
