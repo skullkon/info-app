@@ -97,8 +97,9 @@ func main() {
 	//
 
 	test := repository.NewRepositories(ch, &logger)
-	all, err := test.Information.GetAll(ctx)
+	all, err := test.Information.GetRating(ctx, "brand")
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 

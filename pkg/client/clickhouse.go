@@ -12,6 +12,7 @@ type Client interface {
 	Exec(ctx context.Context, sql string, arguments ...interface{}) error
 	PrepareBatch(ctx context.Context, sql string) (driver.Batch, error)
 	Select(ctx context.Context, dest interface{}, query string, args ...interface{}) error
+	Query(ctx context.Context, query string, args ...interface{}) (rows driver.Rows, err error)
 }
 
 func NewClient(ctx context.Context) (driver.Conn, error) {
