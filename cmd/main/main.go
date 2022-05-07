@@ -1,13 +1,10 @@
 package main
 
 import (
-	"errors"
+	"fmt"
+	"github.com/skullkon/info-app/api"
+	v1 "github.com/skullkon/info-app/api/v1"
 	"github.com/skullkon/info-app/pkg/logging"
-	"github.com/skullkon/info-app/pkg/shutdown"
-	"net"
-	"net/http"
-	"os"
-	"syscall"
 	"time"
 )
 
@@ -26,7 +23,6 @@ type Info struct {
 }
 
 func main() {
-	var listener net.Listener
 	logging.Init()
 	logger := logging.GetLogger()
 	logger.Println("logger initialized")
@@ -96,24 +92,21 @@ func main() {
 	//}
 	//
 
-	server := &http.Server{
-		//Handler:      router,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+	services := v1.Deps{}
+
+	hanlder := v1.NewHandler(services)
+
+	hanlder.InitRoutes()
+
+	serv := api.NewServer(8080, hanlder.InitRoutes())
+	if err := serv.ListenAndServe(); err != nil {
+		fmt.Print(err)
+		return
 	}
 
-	go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
-		server)
+	//go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
+	//	server)
 
 	logger.Println("application initialized and started")
-
-	if err := server.Serve(listener); err != nil {
-		switch {
-		case errors.Is(err, http.ErrServerClosed):
-			logger.Warn("server shutdown")
-		default:
-			logger.Fatal(err)
-		}
-	}
 
 }
