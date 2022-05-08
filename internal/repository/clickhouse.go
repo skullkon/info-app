@@ -96,20 +96,23 @@ func (r *Repository) GetRating(ctx context.Context, attr string) ([]string, erro
 func (r *Repository) GetRatingWithParam(ctx context.Context, column string, value string, attr string) ([]string, error) {
 	var res Result
 	var answer []string
-	//trying to protect against sql injection
+	//trying to protect against sql injection except for binding params
 	attribute := strings.Split(attr, " ")
 	clm := strings.Split(column, " ")
 	val := strings.Split(value, " ")
+
 	if len(clm) != 1 && len(val) != 1 {
 		return nil, errors.New("something goes wrong")
 	}
+
 	query := fmt.Sprintf("SELECT %s FROM info WHERE %s = '%s' Group by %s ORDER BY count(id) DESC LIMIT 100", attribute[0], clm[0], val[0], attribute[0])
-	fmt.Println(query)
+
 	rows, err := r.client.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		err := rows.Scan(&res.Os)
 		if err != nil {
@@ -119,5 +122,4 @@ func (r *Repository) GetRatingWithParam(ctx context.Context, column string, valu
 	}
 
 	return answer, nil
-	return nil, nil
 }

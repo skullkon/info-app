@@ -5,9 +5,14 @@ import (
 	"fmt"
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/skullkon/info-app/internal/repository"
+	"github.com/skullkon/info-app/internal/server"
 	"github.com/skullkon/info-app/internal/service"
+	"github.com/skullkon/info-app/internal/transport/http"
 	"github.com/skullkon/info-app/pkg/client"
 	"github.com/skullkon/info-app/pkg/logging"
+	"github.com/skullkon/info-app/pkg/shutdown"
+	"os"
+	"syscall"
 	"time"
 )
 
@@ -37,6 +42,7 @@ func main() {
 	}))
 	ch, err := client.NewClient(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -46,9 +52,25 @@ func main() {
 
 	services := service.NewServices(deps)
 
-	//go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
-	//	server)
+	handlers := http.NewHandler(services, logger)
 
-	logger.Println("application initialized and started")
+	srv := server.NewServer(handlers.Init())
+
+	err = srv.Run()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	go shutdown.Graceful([]os.Signal{syscall.SIGABRT, syscall.SIGQUIT, syscall.SIGHUP, os.Interrupt, syscall.SIGTERM},
+		srv)
+
+	if err := srv.Stop(ctx); err != nil {
+		logger.Errorf("failed to stop server: %v", err)
+	}
+
+	if err := ch.Close(); err != nil {
+		logger.Error(err.Error())
+	}
 
 }

@@ -1,0 +1,47 @@
+POST http://localhost:8000/api/v1/info/phone-brand
+Content-Type: application/json
+
+{
+  "phone_brand": "Apple"
+}
+
+###
+
+POST http://localhost:8000/api/v1/info/browser-version
+Content-Type: application/json
+
+{
+  "browser_name": "Chrome"
+}
+
+###
+
+POST http://localhost:8000/api/v1/info/os-version
+Content-Type: application/json
+
+{
+  "os_name": "Windows"
+}
+
+###
+
+GET http://localhost:8000/api/v1/info/top-resolution
+Accept: application/json
+
+###
+
+GET http://localhost:8000/api/v1/info/top-browser
+Accept: application/json
+
+###
+
+GET http://localhost:8000/api/v1/info/top-brand
+Accept: application/json
+
+###
+
+GET http://localhost:8000/api/v1/info/get-all
+Accept: application/json
+
+###
+

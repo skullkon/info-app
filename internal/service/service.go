@@ -2,12 +2,15 @@ package service
 
 import (
 	"context"
+	"github.com/skullkon/info-app/internal/domain"
 	"github.com/skullkon/info-app/internal/repository"
 	"github.com/skullkon/info-app/pkg/logging"
 )
 
 type Information interface {
-	HelloWorld(ctx context.Context) (string, error)
+	GetAll(ctx context.Context) ([]domain.Info, error)
+	GetRating(ctx context.Context, attr string) ([]string, error)
+	GetRatingWithParam(ctx context.Context, column string, value string, attr string) ([]string, error)
 }
 
 type Services struct {
