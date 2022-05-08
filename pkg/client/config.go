@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -14,15 +13,11 @@ type ClickHouseConfig struct {
 }
 
 func NewConfig() *ClickHouseConfig {
-	return &ClickHouseConfig{}
-}
-
-func (c *ClickHouseConfig) Init() error {
-	c.Host = os.Getenv("DB_HOST")
-	c.Port = os.Getenv("DB_PORT")
-	c.Dbname = os.Getenv("DB_NAME")
-	c.Username = os.Getenv("DB_USERNAME")
-	c.Password = os.Getenv("DB_PASSWORD")
-	fmt.Println(c.Username)
-	return nil
+	return &ClickHouseConfig{
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Dbname:   os.Getenv("DB_NAME"),
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+	}
 }

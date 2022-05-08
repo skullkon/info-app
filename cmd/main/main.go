@@ -14,7 +14,6 @@ import (
 	"github.com/skullkon/info-app/pkg/shutdown"
 	"os"
 	"syscall"
-	"time"
 )
 
 func main() {
@@ -31,9 +30,10 @@ func main() {
 	}), clickhouse.WithProgress(func(p *clickhouse.Progress) {
 		fmt.Println("progress: ", p)
 	}))
-	config := client.NewConfig()
-	config.Init()
-	ch, err := client.NewClient(ctx, config)
+
+	chConfig := client.NewConfig()
+
+	ch, err := client.NewClient(ctx, chConfig)
 	if err != nil {
 		fmt.Println(err)
 		return
