@@ -1,4 +1,3 @@
-CREATE DATABASE IF NOT EXISTS information;
 CREATE TABLE IF NOT EXISTS info
 (
     id             UUID,
