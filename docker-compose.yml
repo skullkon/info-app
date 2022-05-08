@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  app:
+    image: click-serivce
+    container_name: click-serivce
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ch_server
+      - ch_client
+
+    env_file:
+      - .env
+    networks:
+      - ch_ntw
+
+  ch_server:
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./db:/var/lib/clickhouse
+    networks:
+      - ch_ntw
+
+  ch_client:
+    image: yandex/clickhouse-client
+    entrypoint:
+      - /bin/sleep
+    command:
+      - infinity
+
+    networks:
+      - ch_ntw
+
+
+
+networks:
+  ch_ntw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.222.1.0/24

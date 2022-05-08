@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/joho/godotenv"
 	"github.com/skullkon/info-app/internal/repository"
 	"github.com/skullkon/info-app/internal/server"
 	"github.com/skullkon/info-app/internal/service"
@@ -34,13 +35,19 @@ func main() {
 	logging.Init()
 	logger := logging.GetLogger()
 	logger.Println("logger initialized")
+	if err := godotenv.Load(); err != nil {
+		logger.Fatal("Error loading .env file")
+
+	}
 
 	ctx := clickhouse.Context(context.Background(), clickhouse.WithSettings(clickhouse.Settings{
 		"max_block_size": 10,
 	}), clickhouse.WithProgress(func(p *clickhouse.Progress) {
 		fmt.Println("progress: ", p)
 	}))
-	ch, err := client.NewClient(ctx)
+	config := client.NewConfig()
+	config.Init()
+	ch, err := client.NewClient(ctx, config)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -54,9 +61,10 @@ func main() {
 
 	handlers := http.NewHandler(services, logger)
 
-	srv := server.NewServer(handlers.Init())
+	srv := server.NewServer(handlers.Init(), os.Getenv("PORT"))
 
-	// repos.Information.SeedData(ctx) если нужно заполнить базу рандомной инфой
+	// random data gen
+	repos.Information.SeedData(ctx)
 
 	err = srv.Run()
 	if err != nil {

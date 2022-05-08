@@ -76,7 +76,7 @@ func (s *InformationService) SendData(ctx context.Context, info domain.ClientInf
 		return uuid.Nil, err
 	}
 
-	if len(info.Id) == 0 && ipExist == false {
+	if len(info.Id) == 0 && !ipExist {
 		newInfo.Id = uuid.New()
 		fmt.Println(newInfo)
 		infoList := []domain.Info{newInfo}
@@ -87,7 +87,7 @@ func (s *InformationService) SendData(ctx context.Context, info domain.ClientInf
 		return newInfo.Id, nil
 	}
 
-	if len(info.Id) == 0 && ipExist == true {
+	if len(info.Id) == 0 && ipExist {
 		newInfo.Id, err = s.repository.GetIdByIp(ctx, info.Ip)
 		if err != nil {
 			return uuid.Nil, err

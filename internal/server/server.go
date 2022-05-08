@@ -3,17 +3,20 @@ package server
 import (
 	"context"
 	"net/http"
+	"time"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func NewServer(handler http.Handler) *Server {
+func NewServer(handler http.Handler, port string) *Server {
 	return &Server{
 		httpServer: &http.Server{
-			Addr:    ":8000",
-			Handler: handler,
+			Addr:         ":" + port,
+			Handler:      handler,
+			ReadTimeout:  10 * time.Second,
+			WriteTimeout: 10 * time.Second,
 		},
 	}
 }

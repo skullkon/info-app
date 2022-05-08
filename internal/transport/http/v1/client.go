@@ -19,6 +19,7 @@ func (h *Handler) initClientRoutes(api *gin.RouterGroup) {
 			data, err := h.services.Information.SendData(context, req, context.Request.UserAgent())
 			if err != nil {
 				h.logger.Error(err)
+				context.AbortWithError(http.StatusInternalServerError, err)
 				return
 			}
 			fmt.Println(data)

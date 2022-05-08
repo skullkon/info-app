@@ -61,6 +61,7 @@ func (h *Handler) initInformationRoutes(api *gin.RouterGroup) {
 			all, err := h.services.Information.GetRatingWithParam(context, "os", body.OsName, "osVersion")
 			if err != nil {
 				h.logger.Error(err)
+				context.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
 
@@ -80,6 +81,7 @@ func (h *Handler) initInformationRoutes(api *gin.RouterGroup) {
 			all, err := h.services.Information.GetRatingWithParam(context, "browser", body.BrowserName, "browserVersion")
 			if err != nil {
 				h.logger.Error(err)
+				context.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
 
@@ -99,6 +101,7 @@ func (h *Handler) initInformationRoutes(api *gin.RouterGroup) {
 			all, err := h.services.Information.GetRatingWithParam(context, "brand", body.PhoneBrand, "model")
 			if err != nil {
 				h.logger.Error(err)
+				context.AbortWithStatus(http.StatusInternalServerError)
 				return
 			}
 

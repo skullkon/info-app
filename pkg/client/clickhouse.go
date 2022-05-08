@@ -15,13 +15,15 @@ type Client interface {
 	Query(ctx context.Context, query string, args ...interface{}) (rows driver.Rows, err error)
 }
 
-func NewClient(ctx context.Context) (driver.Conn, error) {
+func NewClient(ctx context.Context, cfg *ClickHouseConfig) (driver.Conn, error) {
+	connAddr := cfg.Host + ":" + cfg.Port
+	fmt.Println(connAddr)
 	conn, err := clickhouse.Open(&clickhouse.Options{
-		Addr: []string{"127.0.0.1:9000"},
+		Addr: []string{connAddr},
 		Auth: clickhouse.Auth{
-			Database: "information",
-			Username: "default",
-			Password: "",
+			Database: cfg.Dbname,
+			Username: cfg.Username,
+			Password: cfg.Password,
 		},
 		DialTimeout:     time.Second,
 		MaxOpenConns:    10,
