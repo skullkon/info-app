@@ -1,9 +1,12 @@
 package domain
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Info struct {
-	Id             int32     `ch:"id"`
+	Id             uuid.UUID `ch:"id"`
 	Ip             string    `ch:"ip"`
 	TypeOfDevice   string    `ch:"type"`
 	Os             string    `ch:"os"`
@@ -17,7 +20,7 @@ type Info struct {
 }
 
 type ClientInfo struct {
-	Id         int32  `json:"id"`
+	Id         string `json:"id"`
 	Ip         string `json:"ip"`
 	Resolution string `json:"resolution"`
 }

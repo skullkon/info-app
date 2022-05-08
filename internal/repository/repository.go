@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/skullkon/info-app/internal/domain"
 	"github.com/skullkon/info-app/pkg/client"
 	"github.com/skullkon/info-app/pkg/logging"
@@ -13,7 +14,8 @@ type Information interface {
 	GetRating(ctx context.Context, attr string) ([]string, error)
 	GetRatingWithParam(ctx context.Context, column string, value string, attr string) ([]string, error)
 	IpExist(ctx context.Context, ip string) (bool, error)
-	GetIdByIp(ctx context.Context, ip string) (int32, error)
+	GetIdByIp(ctx context.Context, ip string) (uuid.UUID, error)
+	SeedData(ctx context.Context)
 }
 
 type Repositories struct {

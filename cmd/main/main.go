@@ -56,6 +56,8 @@ func main() {
 
 	srv := server.NewServer(handlers.Init())
 
+	// repos.Information.SeedData(ctx) если нужно заполнить базу рандомной инфой
+
 	err = srv.Run()
 	if err != nil {
 		fmt.Println(err)

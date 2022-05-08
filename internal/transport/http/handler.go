@@ -26,7 +26,7 @@ func (h *Handler) Init() *gin.Engine {
 	// Init gin handler
 	router := gin.Default()
 
-	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", "127.0.0.1", ":8080")
+	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", "127.0.0.1", ":8000")
 
 	// Init router
 	router.GET("/ping", func(c *gin.Context) {

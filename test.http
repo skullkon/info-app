@@ -1,11 +1,11 @@
 POST http://localhost:8000/api/v1/client/send
 Content-Type: application/json
 
-//если id пустой - пишем на фронте id = -1
+//если id пустой - пишем на фронте id = ""
 {
-  "id": -1,
-  "ip": "1:2:3",
-  "resolution": "1000x500"
+  "id": "",
+  "ip": "1:2:3:123123",
+  "resolution": "1000x500",
 }
 
 ###

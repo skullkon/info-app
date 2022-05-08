@@ -4,10 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	browser "github.com/EDDYCJY/fake-useragent"
+	"github.com/google/uuid"
 	"github.com/skullkon/info-app/internal/domain"
 	"github.com/skullkon/info-app/pkg/client"
 	"github.com/skullkon/info-app/pkg/logging"
+	"github.com/skullkon/info-app/pkg/utils"
+	"github.com/ua-parser/uap-go/uaparser"
 	"strings"
+	"time"
 )
 
 type Repository struct {
@@ -126,7 +131,7 @@ func (r *Repository) GetRatingWithParam(ctx context.Context, column string, valu
 
 func (r *Repository) IpExist(ctx context.Context, ip string) (bool, error) {
 	res := struct {
-		id int32 `ch:"id"`
+		id uuid.UUID `ch:"id"`
 	}{}
 
 	query := fmt.Sprintf("SELECT id FROM info Where ip = '%s' LIMIT 2", ip)
@@ -142,34 +147,94 @@ func (r *Repository) IpExist(ctx context.Context, ip string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if res.id == 0 {
-			return false, nil
+		if len(res.id) != 0 {
+			return true, nil
 		}
 	}
-	return true, nil
+	return false, nil
 }
 
-func (r *Repository) GetIdByIp(ctx context.Context, ip string) (int32, error) {
+func (r *Repository) GetIdByIp(ctx context.Context, ip string) (uuid.UUID, error) {
 	res := struct {
-		id int32 `ch:"id"`
+		id uuid.UUID `ch:"id"`
 	}{}
 
 	query := fmt.Sprintf("SELECT id FROM info Where ip = '%s' LIMIT 2", ip)
 
 	rows, err := r.client.Query(ctx, query)
 	if err != nil {
-		return -1, err
+		return uuid.New(), err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		err := rows.Scan(&res.id)
 		if err != nil {
-			return -1, err
+			return uuid.Nil, err
 		}
-		if res.id == 0 {
-			return -1, nil
+		if len(res.id) == 0 {
+			return uuid.Nil, nil
 		}
 	}
 	return res.id, nil
+}
+
+func (r *Repository) SeedData(ctx context.Context) {
+	parser, err := uaparser.New("./regexes.yaml")
+	if err != nil {
+		r.logger.Fatal(err)
+	}
+	var uaList []domain.Info
+	for i := 0; i < 10000; i++ {
+		t := browser.Random()
+		ua := parser.Parse(t)
+		agent := domain.Info{
+			Id:             uuid.New(),
+			Ip:             utils.GenIP(),
+			TypeOfDevice:   ua.Device.Family,
+			Os:             ua.Os.Family,
+			OsVersion:      ua.Os.Major,
+			Browser:        ua.UserAgent.Family,
+			BrowserVersion: ua.UserAgent.Major + "." + ua.UserAgent.Minor,
+			Brand:          ua.Device.Brand,
+			Model:          ua.Device.Model,
+			Resolution:     utils.GenResolution(),
+			Time:           time.Now(),
+		}
+		uaList = append(uaList, agent)
+
+	}
+	fmt.Println(len(uaList))
+	batch, err := r.client.PrepareBatch(ctx, "INSERT INTO info")
+	if err != nil {
+		r.logger.Println(err)
+		return
+	}
+
+	for i := 0; i < len(uaList); i++ {
+		err := batch.Append(
+			uaList[i].Id,
+			uaList[i].Ip,
+			uaList[i].TypeOfDevice,
+			uaList[i].Os,
+			uaList[i].OsVersion,
+			uaList[i].Browser,
+			uaList[i].BrowserVersion,
+			uaList[i].Brand,
+			uaList[i].Model,
+			uaList[i].Resolution,
+			uaList[i].Time,
+		)
+		if err != nil {
+			r.logger.Print(err)
+			return
+		}
+	}
+
+	err = batch.Send()
+	if err != nil {
+		r.logger.Println(err)
+		return
+	}
+
 }

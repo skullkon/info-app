@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/skullkon/info-app/internal/domain"
 	"github.com/skullkon/info-app/internal/repository"
 	"github.com/skullkon/info-app/pkg/logging"
 	"github.com/skullkon/info-app/pkg/utils"
 	"github.com/ua-parser/uap-go/uaparser"
-	"math/rand"
 	"time"
 )
 
@@ -50,7 +51,7 @@ func (s *InformationService) GetRatingWithParam(ctx context.Context, column stri
 
 }
 
-func (s *InformationService) SendData(ctx context.Context, info domain.ClientInfo, ua string) (int32, error) {
+func (s *InformationService) SendData(ctx context.Context, info domain.ClientInfo, ua string) (uuid.UUID, error) {
 	parser, err := uaparser.New("./regexes.yaml")
 	if err != nil {
 		s.logger.Fatal(err)
@@ -72,36 +73,32 @@ func (s *InformationService) SendData(ctx context.Context, info domain.ClientInf
 
 	ipExist, err := s.repository.IpExist(ctx, info.Ip)
 	if err != nil {
-		return -1, err
+		return uuid.Nil, err
 	}
 
-	if info.Id < 0 && ipExist == false {
-		// in the whole system I need to replace int id with guid
-		//in order to simply generate random user ids, but
-		//I forgot about this at the design stage
-		rand.Seed(time.Now().UnixNano())
-		newInfo.Id = rand.Int31n(10000)
-
+	if len(info.Id) == 0 && ipExist == false {
+		newInfo.Id = uuid.New()
+		fmt.Println(newInfo)
 		infoList := []domain.Info{newInfo}
 		if err := s.repository.Insert(ctx, infoList); err != nil {
-			return -1, err
+			return uuid.Nil, err
 		}
 
 		return newInfo.Id, nil
 	}
 
-	if info.Id < 0 && ipExist == true {
+	if len(info.Id) == 0 && ipExist == true {
 		newInfo.Id, err = s.repository.GetIdByIp(ctx, info.Ip)
 		if err != nil {
-			return -1, err
+			return uuid.Nil, err
 		}
 		infoList := []domain.Info{newInfo}
 		if err := s.repository.Insert(ctx, infoList); err != nil {
-			return -1, err
+			return uuid.Nil, err
 		}
 
 		return newInfo.Id, nil
 	}
 
-	return -1, nil
+	return uuid.Nil, nil
 }
