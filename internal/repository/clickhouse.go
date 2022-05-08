@@ -123,3 +123,53 @@ func (r *Repository) GetRatingWithParam(ctx context.Context, column string, valu
 
 	return answer, nil
 }
+
+func (r *Repository) IpExist(ctx context.Context, ip string) (bool, error) {
+	res := struct {
+		id int32 `ch:"id"`
+	}{}
+
+	query := fmt.Sprintf("SELECT id FROM info Where ip = '%s' LIMIT 2", ip)
+
+	rows, err := r.client.Query(ctx, query)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&res.id)
+		if err != nil {
+			return false, err
+		}
+		if res.id == 0 {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (r *Repository) GetIdByIp(ctx context.Context, ip string) (int32, error) {
+	res := struct {
+		id int32 `ch:"id"`
+	}{}
+
+	query := fmt.Sprintf("SELECT id FROM info Where ip = '%s' LIMIT 2", ip)
+
+	rows, err := r.client.Query(ctx, query)
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&res.id)
+		if err != nil {
+			return -1, err
+		}
+		if res.id == 0 {
+			return -1, nil
+		}
+	}
+	return res.id, nil
+}

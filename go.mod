@@ -4,15 +4,14 @@ go 1.18
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.0.14
-	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/sirupsen/logrus v1.8.1
+	github.com/swaggo/swag v1.8.1
+	github.com/ua-parser/uap-go v0.0.0-20211112212520-00c877edfe0f
 )
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/PuerkitoBio/purell v1.1.1 // indirect
-	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
@@ -33,13 +32,10 @@ require (
 	github.com/paulmach/orb v0.5.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/swaggo/gin-swagger v1.4.3 // indirect
-	github.com/swaggo/swag v1.8.1 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122 // indirect
-	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect

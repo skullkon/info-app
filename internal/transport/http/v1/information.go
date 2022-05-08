@@ -5,14 +5,10 @@ import (
 	"net/http"
 )
 
-type RatingWithParam struct {
-	Column string `json:"column"`
-	Value  string `json:"value"`
-}
-
 func (h *Handler) initInformationRoutes(api *gin.RouterGroup) {
 	info := api.Group("/info")
 	{
+
 		info.GET("/get-all", func(context *gin.Context) {
 			all, err := h.services.Information.GetAll(context)
 			if err != nil {

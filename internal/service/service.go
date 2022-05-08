@@ -11,6 +11,7 @@ type Information interface {
 	GetAll(ctx context.Context) ([]domain.Info, error)
 	GetRating(ctx context.Context, attr string) ([]string, error)
 	GetRatingWithParam(ctx context.Context, column string, value string, attr string) ([]string, error)
+	SendData(ctx context.Context, info domain.ClientInfo, ua string) (int32, error)
 }
 
 type Services struct {

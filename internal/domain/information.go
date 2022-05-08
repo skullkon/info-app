@@ -15,3 +15,9 @@ type Info struct {
 	Resolution     string    `ch:"resolution"`
 	Time           time.Time `ch:"time"`
 }
+
+type ClientInfo struct {
+	Id         int32  `json:"id"`
+	Ip         string `json:"ip"`
+	Resolution string `json:"resolution"`
+}

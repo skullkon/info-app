@@ -12,6 +12,8 @@ type Information interface {
 	GetAll(ctx context.Context) ([]domain.Info, error)
 	GetRating(ctx context.Context, attr string) ([]string, error)
 	GetRatingWithParam(ctx context.Context, column string, value string, attr string) ([]string, error)
+	IpExist(ctx context.Context, ip string) (bool, error)
+	GetIdByIp(ctx context.Context, ip string) (int32, error)
 }
 
 type Repositories struct {
